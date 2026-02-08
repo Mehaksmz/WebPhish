@@ -3,7 +3,7 @@ import os
 from collections import Counter
 
 FIXED_WIDTH = 256
-root_dir = "/home/mehak/n96ncsr5g4-1/n96ncsr5g4-1/dataset"
+root_dir = "/home/mehak/n96ncsr5g4-1/dataset"
 
 def collect_heights(root_dir, fixed_width=256):
     heights = []

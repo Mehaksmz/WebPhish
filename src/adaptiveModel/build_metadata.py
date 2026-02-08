@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 
-DATASET_ROOT = "data/n96ncsr5g4-1/n96ncsr5g4-1/dataset"
+DATASET_ROOT = "data/n96ncsr5g4-1/dataset"
 LABEL_CSV = "data/index2.csv"
 OUTPUT_META = "data/metadata.csv"
 
