@@ -11,7 +11,7 @@ import os
 IMG_SIZE = 224
 BATCH_SIZE = 32
 EPOCHS = 20
-DATA_DIR = "/home/mehak/image-dataset"
+DATA_DIR = "preprocess"
 
 
 # ================= DATA =================
@@ -63,7 +63,7 @@ def build_model(name):
     model.compile(
         optimizer=Adam(1e-4),
         loss="binary_crossentropy",
-        metrics=["accuracy", tf.keras.metrics.AUC(name="auc")]
+        metrics=["accuracy"]
     )
 
     return model, base
@@ -78,7 +78,7 @@ def fine_tune(model, base_model, unfreeze=20):
     model.compile(
         optimizer=Adam(1e-5),
         loss="binary_crossentropy",
-        metrics=["accuracy", tf.keras.metrics.AUC(name="auc")]
+        metrics=["accuracy"]
     )
 
     return model
