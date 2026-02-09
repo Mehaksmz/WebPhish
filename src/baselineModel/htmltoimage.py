@@ -14,10 +14,18 @@ def html_to_image(html_path, size=IMAGE_SIZE):
 
     required_len = size * size
 
+    # if len(byte_array) < required_len:
+    #     pad_len = required_len - len(byte_array)
+    #     random_pad = np.random.randint(0, IMAGE_SIZE, pad_len, dtype=np.uint8)
+    #     byte_array = np.concatenate([byte_array, random_pad])
+    # else:
+    #     byte_array = byte_array[:required_len]
     if len(byte_array) < required_len:
-        pad_len = required_len - len(byte_array)
-        random_pad = np.random.randint(0, IMAGE_SIZE, pad_len, dtype=np.uint8)
-        byte_array = np.concatenate([byte_array, random_pad])
+        byte_array = np.pad(
+            byte_array,
+            (0, required_len - len(byte_array)),
+            mode="constant"
+        )
     else:
         byte_array = byte_array[:required_len]
 
