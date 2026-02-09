@@ -66,13 +66,11 @@ def build_model(name):
         metrics=["accuracy", tf.keras.metrics.AUC(name="auc")]
     )
 
-    return model
+    return model, base
 
 
 # ================= FINE-TUNE =================
-def fine_tune(model, unfreeze=20):
-
-    base_model = model.layers[0]  # the pretrained CNN
+def fine_tune(model, base_model, unfreeze=20):
 
     for layer in base_model.layers[-unfreeze:]:
         layer.trainable = True
@@ -91,7 +89,7 @@ def train(name):
 
     print(f"\n==== Training {name.upper()} ====\n")
 
-    model = build_model(name)
+    model, base_model = build_model(name)
 
     early = EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True)
 
@@ -106,7 +104,7 @@ def train(name):
               callbacks=[early, checkpoint])
 
     # Stage 2
-    model = fine_tune(model)
+    model = fine_tune(model, base_model)
     model.fit(train_data, validation_data=val_data, epochs=10,
               callbacks=[early, checkpoint])
 
