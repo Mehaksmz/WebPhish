@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import roc_curve, auc, precision_recall_curve, average_precision_score
 
 from sklearn.metrics import (
     accuracy_score,
@@ -48,8 +49,7 @@ print(classification_report(y_true, y_pred, target_names=["Legitimate", "Phishin
 
 
 titles_options = [
-    ("Confusion Matrix (Counts)", None),
-    ("Normalized Confusion Matrix", "true")
+    ("Confusion Matrix (Counts)", None)
 ]
 
 for title, normalize in titles_options:
@@ -61,58 +61,71 @@ for title, normalize in titles_options:
     plt.title(title)
     plt.show()
 
-false_positives = []
-false_negatives = []
+fpr, tpr, _ = roc_curve(y_true, y_prob)
+roc_auc = auc(fpr, tpr)
 
-for images, labels in test_ds:
-    probs = model.predict(images, verbose=0)
-    preds = (probs > THRESHOLD).astype(int).flatten()
-
-    for img, true, pred in zip(images, labels.numpy(), preds):
-        if true == 0 and pred == 1:
-            false_positives.append(img)
-        elif true == 1 and pred == 0:
-            false_negatives.append(img)
-
-print(f"False Positives: {len(false_positives)}")
-print(f"False Negatives: {len(false_negatives)}")
-
-
-def show_images(images, title, max_images=10):
-    if len(images) == 0:
-        print(f"No images to display for {title}")
-        return
-
-    plt.figure(figsize=(15, 6))
-    for i, img in enumerate(images[:max_images]):
-        plt.subplot(2, 5, i + 1)
-        plt.imshow(img.numpy().squeeze(), cmap="gray")
-        plt.axis("off")
-
-    plt.suptitle(title, fontsize=16)
-    plt.tight_layout()
-    plt.show()
-
-
-show_images(false_positives, "False Positives (Legitimate → Predicted Phishing)")
-show_images(false_negatives, "False Negatives (Phishing → Predicted Legitimate)")
-
-
-images, labels = next(iter(test_ds))
-pred_probs = model.predict(images)
-pred_labels = (pred_probs > THRESHOLD).astype(int).flatten()
-
-plt.figure(figsize=(15, 6))
-for i in range(10):
-    plt.subplot(2, 5, i + 1)
-    plt.imshow(images[i].numpy().squeeze(), cmap="gray")
-
-    true_label = class_names[int(labels[i])]
-    pred_label = class_names[int(pred_labels[i])]
-
-    plt.title(f"True: {true_label}\nPred: {pred_label}", fontsize=10)
-    plt.axis("off")
-
-plt.suptitle("Test Images: True Label vs Predicted Label", fontsize=16)
-plt.tight_layout()
+plt.figure()
+plt.plot(fpr, tpr, label=f"AUC = {roc_auc:.4f}")
+plt.plot([0, 1], [0, 1], linestyle="--")
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curve")
+plt.legend(loc="lower right")
+plt.grid()
 plt.show()
+
+# false_positives = []
+# false_negatives = []
+
+# for images, labels in test_ds:
+#     probs = model.predict(images, verbose=0)
+#     preds = (probs > THRESHOLD).astype(int).flatten()
+
+#     for img, true, pred in zip(images, labels.numpy(), preds):
+#         if true == 0 and pred == 1:
+#             false_positives.append(img)
+#         elif true == 1 and pred == 0:
+#             false_negatives.append(img)
+
+# print(f"False Positives: {len(false_positives)}")
+# print(f"False Negatives: {len(false_negatives)}")
+
+
+# def show_images(images, title, max_images=10):
+#     if len(images) == 0:
+#         print(f"No images to display for {title}")
+#         return
+
+#     plt.figure(figsize=(15, 6))
+#     for i, img in enumerate(images[:max_images]):
+#         plt.subplot(2, 5, i + 1)
+#         plt.imshow(img.numpy().squeeze(), cmap="gray")
+#         plt.axis("off")
+
+#     plt.suptitle(title, fontsize=16)
+#     plt.tight_layout()
+#     plt.show()
+
+
+# show_images(false_positives, "False Positives (Legitimate → Predicted Phishing)")
+# show_images(false_negatives, "False Negatives (Phishing → Predicted Legitimate)")
+
+
+# images, labels = next(iter(test_ds))
+# pred_probs = model.predict(images)
+# pred_labels = (pred_probs > THRESHOLD).astype(int).flatten()
+
+# plt.figure(figsize=(15, 6))
+# for i in range(10):
+#     plt.subplot(2, 5, i + 1)
+#     plt.imshow(images[i].numpy().squeeze(), cmap="gray")
+
+#     true_label = class_names[int(labels[i])]
+#     pred_label = class_names[int(pred_labels[i])]
+
+#     plt.title(f"True: {true_label}\nPred: {pred_label}", fontsize=10)
+#     plt.axis("off")
+
+# plt.suptitle("Test Images: True Label vs Predicted Label", fontsize=16)
+# plt.tight_layout()
+# plt.show()

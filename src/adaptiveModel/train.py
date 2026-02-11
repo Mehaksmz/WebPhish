@@ -1,19 +1,19 @@
 import tensorflow as tf
 from preprocess import load_dataset
 
-train_ds = load_dataset("train")
-val_ds = load_dataset("val")
+train_ds = load_dataset("train").batch(1)
+val_ds = load_dataset("val").batch(1)
 
 model = tf.keras.Sequential([
     tf.keras.layers.Rescaling(1./255),
 
-    tf.keras.layers.Conv2D(32, 3, activation="relu"),
+    tf.keras.layers.Conv2D(32, 3, padding="same", activation="relu"),
     tf.keras.layers.MaxPooling2D(),
 
-    tf.keras.layers.Conv2D(64, 3, activation="relu"),
+    tf.keras.layers.Conv2D(64, 3, padding="same", activation="relu"),
     tf.keras.layers.MaxPooling2D(),
 
-    tf.keras.layers.Conv2D(128, 3, activation="relu"),
+    tf.keras.layers.Conv2D(128, 3, padding="same", activation="relu"),
 
     tf.keras.layers.GlobalAveragePooling2D(),
 
@@ -33,8 +33,11 @@ model.fit(
     validation_data=val_ds,
     epochs=20,
     callbacks=[
-        tf.keras.callbacks.EarlyStopping(patience=3, monitor="val_loss",
-restore_best_weights=True)
+        tf.keras.callbacks.EarlyStopping(
+            patience=3,
+            monitor="val_loss",
+            restore_best_weights=True
+        )
     ]
 )
 

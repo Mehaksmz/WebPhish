@@ -17,7 +17,7 @@ SIZE = 224
 IMG_SIZE = (SIZE, SIZE)
 BATCH_SIZE = 32
 THRESHOLD = 0.5
-DATA_DIR = "/home/mehak/image-dataset"
+DATA_DIR = "preprocess"
 
 model = tf.keras.models.load_model("resnet50_final.keras")
 

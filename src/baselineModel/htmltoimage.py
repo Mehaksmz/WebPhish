@@ -5,14 +5,14 @@ from PIL import Image
 
 DATASET_ROOT = "data/n96ncsr5g4-1/n96ncsr5g4-1/dataset"
 OUTPUT_ROOT  = "output"
-IMAGE_SIZE = 128
+IMAGE_SIZE = 32
 
 
 def html_to_image(html_path, size=IMAGE_SIZE):
     with open(html_path, "rb") as f:   
         byte_array = np.frombuffer(f.read(), dtype=np.uint8)
 
-    # required_len = size * size
+    required_len = size * size
 
     # if len(byte_array) < required_len:
     #     pad_len = required_len - len(byte_array)
@@ -21,34 +21,34 @@ def html_to_image(html_path, size=IMAGE_SIZE):
     # else:
     #     byte_array = byte_array[:required_len]
     #for black padded
-    # if len(byte_array) < required_len:
-    #     byte_array = np.pad(
-    #         byte_array,
-    #         (0, required_len - len(byte_array)),
-    #         mode="constant"
-    #     )
-    # else:
-    #     byte_array = byte_array[:required_len]
+    if len(byte_array) < required_len:
+        byte_array = np.pad(
+            byte_array,
+            (0, required_len - len(byte_array)),
+            mode="constant"
+        )
+    else:
+        byte_array = byte_array[:required_len]
 
-    # image_array = byte_array.reshape((size, size))
-    # return Image.fromarray(image_array, mode="L")
+    image_array = byte_array.reshape((size, size))
+    return Image.fromarray(image_array, mode="L")
       # ---------- crop to square using real bytes ----------
-    side = int(np.sqrt(len(byte_array)))
+    # side = int(np.sqrt(len(byte_array)))
 
-    if side == 0:
-        # empty file safeguard
-        byte_array = np.zeros(size * size, dtype=np.uint8)
-        side = size
+    # if side == 0:
+    #     # empty file safeguard
+    #     byte_array = np.zeros(size * size, dtype=np.uint8)
+    #     side = size
 
-    byte_array = byte_array[: side * side]
+    # byte_array = byte_array[: side * side]
 
-    image_array = byte_array.reshape((side, side))
-    img = Image.fromarray(image_array, mode="L")
+    # image_array = byte_array.reshape((side, side))
+    # img = Image.fromarray(image_array, mode="L")
 
-    # ---------- resize to fixed CNN size ----------
-    img = img.resize((size, size), Image.BILINEAR)
+    # # ---------- resize to fixed CNN size ----------
+    # img = img.resize((size, size), Image.BILINEAR)
 
-    return img
+    # return img
 
 
 def process_dataset(dataset_root, output_root):
