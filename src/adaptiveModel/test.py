@@ -31,7 +31,7 @@ model = tf.keras.models.load_model("adaptive_model_2.keras")
 # -----------------------------
 # Load test dataset
 # -----------------------------
-test_ds = load_dataset("test2").batch(BATCH_SIZE)
+test_ds = load_dataset("test").batch(BATCH_SIZE)
 
 # -----------------------------
 # Prepare true labels, predictions, probabilities
