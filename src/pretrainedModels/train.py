@@ -94,7 +94,7 @@ def train(name):
     early = EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True)
 
     checkpoint = ModelCheckpoint(
-        "resnet50_best.keras",
+        "vgg_best.keras",
         monitor="val_loss",
         save_best_only=True
     )
@@ -110,11 +110,11 @@ def train(name):
 
     # Save final
     # os.makedirs("models", exist_ok=True)
-    model.save("resnet50_final.keras")
+    model.save("vgg_final.keras")
 
  
 
 
 # ================= RUN =================
 # for m in ["resnet", "vgg", "inception"]:
-train("resnet")
+train("vgg")
