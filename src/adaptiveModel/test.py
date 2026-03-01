@@ -76,20 +76,20 @@ print(classification_report(y_true, y_pred, target_names=["Legitimate", "Phishin
 # -----------------------------
 # Confusion matrices
 # -----------------------------
-# titles_options = [
-#     ("Confusion Matrix (Counts)", None),
-#     ("Normalized Confusion Matrix", "true")
-# ]
+titles_options = [
+    ("Confusion Matrix (Counts)", None),
+    ("Normalized Confusion Matrix", "true")
+]
 
-# for title, normalize in titles_options:
-#     disp = ConfusionMatrixDisplay(
-#         confusion_matrix=confusion_matrix(y_true, y_pred, normalize=normalize),
-#         display_labels=["Legitimate", "Phishing"]
-#     )
-#     disp.plot(cmap=plt.cm.Blues, values_format=".2f" if normalize else "d")
-#     plt.title(title)
-#     plt.savefig(os.path.join(RESULTS_DIR, f"{title.replace(' ', '_')}.png"))
-#     plt.close()
+for title, normalize in titles_options:
+    disp = ConfusionMatrixDisplay(
+        confusion_matrix=confusion_matrix(y_true, y_pred, normalize=normalize),
+        display_labels=["Legitimate", "Phishing"]
+    )
+    disp.plot(cmap=plt.cm.Blues, values_format=".2f" if normalize else "d")
+    plt.title(title)
+    plt.savefig(os.path.join(RESULTS_DIR, f"{title.replace(' ', '_')}.png"))
+    plt.close()
 
 # -----------------------------
 # ROC Curve and AUC (FIXED)

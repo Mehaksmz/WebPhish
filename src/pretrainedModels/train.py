@@ -5,34 +5,52 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.applications import ResNet50, VGG19, InceptionV3
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-from tensorflow.keras.applications.resnet50 import preprocess_input
+import numpy as np
 import os
+from sklearn.utils import class_weight
 
 IMG_SIZE = 224
 BATCH_SIZE = 32
-EPOCHS = 20
+EPOCHS_STAGE1 = 20
+EPOCHS_STAGE2 = 15
 DATA_DIR = "preprocess"
 
 
+# ================= PREPROCESSING =================
+def get_preprocess_function(name):
+    if name == "resnet":
+        from tensorflow.keras.applications.resnet50 import preprocess_input
+    elif name == "vgg":
+        from tensorflow.keras.applications.vgg19 import preprocess_input
+    elif name == "inception":
+        from tensorflow.keras.applications.inception_v3 import preprocess_input
+    else:
+        raise ValueError("Invalid model name")
+    return preprocess_input
+
+
 # ================= DATA =================
-train_gen = ImageDataGenerator(preprocessing_function=preprocess_input)
-val_gen = ImageDataGenerator(preprocessing_function=preprocess_input)
+def get_data_generators(preprocess_input):
+    train_gen = ImageDataGenerator(preprocessing_function=preprocess_input)
+    val_gen = ImageDataGenerator(preprocessing_function=preprocess_input)
 
-train_data = train_gen.flow_from_directory(
-    os.path.join(DATA_DIR, "train"),
-    target_size=(IMG_SIZE, IMG_SIZE),
-    batch_size=BATCH_SIZE,
-    class_mode="binary",
-    color_mode="rgb"
-)
+    train_data = train_gen.flow_from_directory(
+        os.path.join(DATA_DIR, "train"),
+        target_size=(IMG_SIZE, IMG_SIZE),
+        batch_size=BATCH_SIZE,
+        class_mode="binary",
+        color_mode="rgb"
+    )
 
-val_data = val_gen.flow_from_directory(
-    os.path.join(DATA_DIR, "val"), 
-    target_size=(IMG_SIZE, IMG_SIZE),
-    batch_size=BATCH_SIZE,
-    class_mode="binary",
-    color_mode="rgb"
-)
+    val_data = val_gen.flow_from_directory(
+        os.path.join(DATA_DIR, "val"),
+        target_size=(IMG_SIZE, IMG_SIZE),
+        batch_size=BATCH_SIZE,
+        class_mode="binary",
+        color_mode="rgb"
+    )
+
+    return train_data, val_data
 
 
 # ================= MODEL =================
@@ -50,9 +68,11 @@ def build_model(name):
     else:
         raise ValueError("Invalid model")
 
+    # Freeze base layers
     for layer in base.layers:
         layer.trainable = False
 
+    # Classification head
     x = GlobalAveragePooling2D()(base.output)
     x = Dense(256, activation="relu")(x)
     x = Dropout(0.5)(x)
@@ -63,22 +83,22 @@ def build_model(name):
     model.compile(
         optimizer=Adam(1e-4),
         loss="binary_crossentropy",
-        metrics=["accuracy"]
+        metrics=["accuracy", tf.keras.metrics.AUC(name="auc")]
     )
 
     return model, base
 
 
 # ================= FINE-TUNE =================
-def fine_tune(model, base_model, unfreeze=20):
+def fine_tune(model, base_model, unfreeze=50):
 
     for layer in base_model.layers[-unfreeze:]:
         layer.trainable = True
 
     model.compile(
-        optimizer=Adam(1e-5),
+        optimizer=Adam(1e-5),  # lower LR for stability
         loss="binary_crossentropy",
-        metrics=["accuracy"]
+        metrics=["accuracy", tf.keras.metrics.AUC(name="auc")]
     )
 
     return model
@@ -89,32 +109,60 @@ def train(name):
 
     print(f"\n==== Training {name.upper()} ====\n")
 
+    preprocess_input = get_preprocess_function(name)
+    train_data, val_data = get_data_generators(preprocess_input)
+
+    # -------- CLASS WEIGHTS (KEY FIX) --------
+    weights = class_weight.compute_class_weight(
+        class_weight="balanced",
+        classes=np.unique(train_data.classes),
+        y=train_data.classes
+    )
+    class_weights = dict(enumerate(weights))
+    print("Class weights:", class_weights)
+
+    # -------- MODEL --------
     model, base_model = build_model(name)
 
-    early = EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True)
+    os.makedirs("models", exist_ok=True)
 
-    checkpoint = ModelCheckpoint(
-        "vgg_best.keras",
+    early = EarlyStopping(
         monitor="val_loss",
-        save_best_only=True
+        patience=3,
+        restore_best_weights=True
     )
 
-    # Stage 1
-    model.fit(train_data, validation_data=val_data, epochs=EPOCHS,
-              callbacks=[early, checkpoint])
+    checkpoint = ModelCheckpoint(
+        f"models/{name}_best.keras",
+        monitor="val_loss",
+        save_best_only=True,
+        verbose=1
+    )
 
-    # Stage 2
+    # ===== Stage 1 =====
+    model.fit(
+        train_data,
+        validation_data=val_data,
+        epochs=EPOCHS_STAGE1,
+        callbacks=[early, checkpoint],
+        class_weight=class_weights
+    )
+
+    # ===== Stage 2 (fine-tune deeper) =====
     model = fine_tune(model, base_model)
-    model.fit(train_data, validation_data=val_data, epochs=10,
-              callbacks=[early, checkpoint])
+
+    model.fit(
+        train_data,
+        validation_data=val_data,
+        epochs=EPOCHS_STAGE2,
+        callbacks=[early, checkpoint],
+        class_weight=class_weights
+    )
 
     # Save final
-    # os.makedirs("models", exist_ok=True)
-    model.save("vgg_final.keras")
-
- 
+    model.save(f"models/{name}_final.keras")
+    print(f"\n✅ {name.upper()} training complete.\n")
 
 
 # ================= RUN =================
-# for m in ["resnet", "vgg", "inception"]:
-train("vgg")
+train("vgg")   # change to resnet / inception if needed
