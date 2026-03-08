@@ -4,15 +4,15 @@ from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Dropout
 from tensorflow.keras.models import Model
 from tensorflow.keras.applications import ResNet50, VGG19, InceptionV3
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 import numpy as np
 import os
 from sklearn.utils import class_weight
 
-IMG_SIZE = 224
+IMG_SIZE = 299
 BATCH_SIZE = 32
 EPOCHS_STAGE1 = 20
-EPOCHS_STAGE2 = 15
+EPOCHS_STAGE2 = 10
 DATA_DIR = "preprocess"
 
 
@@ -74,7 +74,7 @@ def build_model(name):
 
     # Classification head
     x = GlobalAveragePooling2D()(base.output)
-    x = Dense(256, activation="relu")(x)
+    x = Dense(512, activation="relu")(x)
     x = Dropout(0.5)(x)
     output = Dense(1, activation="sigmoid")(x)
 
@@ -90,13 +90,13 @@ def build_model(name):
 
 
 # ================= FINE-TUNE =================
-def fine_tune(model, base_model, unfreeze=50):
+def fine_tune(model, base_model, unfreeze=120):
 
     for layer in base_model.layers[-unfreeze:]:
         layer.trainable = True
 
     model.compile(
-        optimizer=Adam(1e-5),  # lower LR for stability
+        optimizer=Adam(5e-6),  # lower LR for stability
         loss="binary_crossentropy",
         metrics=["accuracy", tf.keras.metrics.AUC(name="auc")]
     )
@@ -139,12 +139,19 @@ def train(name):
         verbose=1
     )
 
+    reduce_lr = ReduceLROnPlateau(
+        monitor="val_loss",
+        factor=0.3,
+        patience=2,
+        min_lr=1e-6,
+        verbose=1
+    )
     # ===== Stage 1 =====
     model.fit(
         train_data,
         validation_data=val_data,
         epochs=EPOCHS_STAGE1,
-        callbacks=[early, checkpoint],
+        callbacks=[early, checkpoint, reduce_lr],
         class_weight=class_weights
     )
 
@@ -155,7 +162,7 @@ def train(name):
         train_data,
         validation_data=val_data,
         epochs=EPOCHS_STAGE2,
-        callbacks=[early, checkpoint],
+        callbacks=[early, checkpoint, reduce_lr],
         class_weight=class_weights
     )
 
@@ -165,4 +172,4 @@ def train(name):
 
 
 # ================= RUN =================
-train("vgg")   # change to resnet / inception if needed
+train("inception")   # change to resnet / inception if needed
