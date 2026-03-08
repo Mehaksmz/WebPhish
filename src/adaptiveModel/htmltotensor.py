@@ -38,3 +38,5 @@ def html_to_tensor(path):
     image = tf.pad(image, [[0, pad_height], [0, 0], [0, 0]])
 
     return image
+
+
