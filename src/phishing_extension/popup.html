@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="popup">
+  <div class="popup-header">
+    <div class="popup-title">Phishing Website Detection</div>
+    <div class="popup-subtitle">Analyze the current tab and send feedback.</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Current URL</div>
+    <div id="url" class="mono small"></div>
+
+    <div class="row">
+      <div class="grow">
+        <div class="label">Model</div>
+        <select id="model" class="control">
+          <option value="AdaptiveCNN">AdaptiveCNN</option>
+          <option value="BaselineCNN">BaselineCNN</option>
+        </select>
+      </div>
+      <button id="scan" class="btn btn-primary">Analyze</button>
+    </div>
+
+    <div id="status" class="status"></div>
+  </div>
+
+  <div id="result" class="card hidden"></div>
+
+  <div class="card">
+    <div class="label">Feedback</div>
+    <div class="button-row">
+      <button id="reportFalseAlarm" class="btn btn-secondary" disabled>Report False Alarm</button>
+      <button id="reportMissedPhishing" class="btn btn-secondary" disabled>Report Missed Phishing</button>
+    </div>
+    <div id="feedbackStatus" class="status"></div>
+  </div>
+</div>
+
+<script src="popup.js"></script>
+
+</body>
+</html>
