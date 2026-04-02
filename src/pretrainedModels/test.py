@@ -27,7 +27,7 @@ IMG_SIZE = (SIZE, SIZE)
 BATCH_SIZE = 32
 THRESHOLD = 0.5
 DATA_DIR = "preprocess"
-RESULTS_DIR = "results/resnet"
+RESULTS_DIR = "results/inception"
 
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
@@ -102,20 +102,14 @@ print(classification_report(y_true, y_pred, target_names=class_names))
 # -----------------------------
 # CONFUSION MATRICES
 # -----------------------------
-titles_options = [
-    ("Confusion Matrix (Counts)vgg", None),
-    ("Normalized Confusion Matrixvgg", "true")
-]
-
-for title, normalize in titles_options:
-    disp = ConfusionMatrixDisplay(
-        confusion_matrix=confusion_matrix(y_true, y_pred, normalize=normalize),
-        display_labels=class_names
-    )
-    disp.plot(cmap=plt.cm.Blues, values_format=".2f" if normalize else "d")
-    plt.title(title)
-    plt.savefig(os.path.join(RESULTS_DIR, "resnet.png"))
-    plt.close()
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=confusion_matrix(y_true, y_pred),
+    display_labels=class_names
+)
+disp.plot(cmap=plt.cm.Blues, values_format="d")
+plt.title("Confusion Matrix (Counts)inception")
+plt.savefig(os.path.join(RESULTS_DIR, "inceptionV3.png"))
+plt.close()
 
 # # -----------------------------
 # # ROC CURVE + AUC
