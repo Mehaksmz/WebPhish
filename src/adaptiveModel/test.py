@@ -15,7 +15,7 @@ from sklearn.metrics import (
 )
 
 # -----------------------------
-# ⚡ Configuration
+#  Configuration
 # -----------------------------
 THRESHOLD = 0.5
 BATCH_SIZE = 1  # variable image heights

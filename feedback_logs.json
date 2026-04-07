@@ -1,0 +1,80 @@
+[
+  {
+    "url": "https://www.saffronart.com/",
+    "type": "false_alarm",
+    "model": "AdaptiveCNN",
+    "timestamp": "2026-03-27T10:21:51.811264"
+  },
+  {
+    "url": "https://www.paypal-merchant.com/micrositeportal/",
+    "type": "missed_phishing",
+    "model": "BaselineCNN",
+    "timestamp": "2026-03-27T10:25:28.640832"
+  },
+  {
+    "url": "https://www.hugedomains.com/domain_profile.cfm?d=cryptonight.net",
+    "type": "missed_phishing",
+    "model": "AdaptiveCNN",
+    "timestamp": "2026-03-27T10:26:27.170226"
+  },
+  {
+    "url": "https://www.hugedomains.com/domain_profile.cfm?d=cryptonight.net",
+    "type": "missed_phishing",
+    "model": "BaselineCNN",
+    "timestamp": "2026-03-27T10:26:37.609258"
+  },
+  {
+    "url": "https://moonfruit.com/",
+    "type": "missed_phishing",
+    "model": "AdaptiveCNN",
+    "timestamp": "2026-03-27T11:48:33.562079"
+  },
+  {
+    "url": "https://moonfruit.com/",
+    "type": "missed_phishing",
+    "model": "BaselineCNN",
+    "timestamp": "2026-03-27T11:48:43.265517"
+  },
+  {
+    "url": "https://www.scandlines.dk/",
+    "type": "false_alarm",
+    "model": "BaselineCNN",
+    "timestamp": "2026-03-27T12:46:30.634952"
+  },
+  {
+    "url": "https://www.scandlines.dk/",
+    "type": "false_alarm",
+    "model": "AdaptiveCNN",
+    "timestamp": "2026-03-27T12:46:48.490425"
+  },
+  {
+    "url": "https://playndwin.ae/gateway/index.php",
+    "type": "missed_phishing",
+    "model": "BaselineCNN",
+    "timestamp": "2026-03-27T12:48:28.667029"
+  },
+  {
+    "url": "https://chat.whatsapp.com/CCrTu73IQtiLiS0TZeHiSY",
+    "type": "missed_phishing",
+    "model": "BaselineCNN",
+    "timestamp": "2026-03-27T12:49:20.079648"
+  },
+  {
+    "url": "https://chat.whatsapp.com/KvsMf292NUS5Ek3VPUMDE2?mode=gi_t",
+    "type": "missed_phishing",
+    "model": "BaselineCNN",
+    "timestamp": "2026-03-27T12:49:55.763473"
+  },
+  {
+    "url": "https://www.crowncenter.com/",
+    "type": "false_alarm",
+    "model": "AdaptiveCNN",
+    "timestamp": "2026-03-27T17:10:07.646661"
+  },
+  {
+    "url": "https://ron.mamma.com/travel/?s1paid=802422&segment=rsoc.ron.mamma.001&s1pcid=switzerlandnesia.com",
+    "type": "missed_phishing",
+    "model": "BaselineCNN",
+    "timestamp": "2026-03-27T17:11:10.059781"
+  }
+]
