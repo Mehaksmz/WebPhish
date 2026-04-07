@@ -111,81 +111,81 @@ plt.title("Confusion Matrix (Counts)inception")
 plt.savefig(os.path.join(RESULTS_DIR, "inceptionV3.png"))
 plt.close()
 
-# # -----------------------------
-# # ROC CURVE + AUC
-# # -----------------------------
-# fpr, tpr, thresholds = roc_curve(y_true, y_prob)
-# auc_score = roc_auc_score(y_true, y_prob)
+# -----------------------------
+# ROC CURVE + AUC
+# -----------------------------
+fpr, tpr, thresholds = roc_curve(y_true, y_prob)
+auc_score = roc_auc_score(y_true, y_prob)
 
-# plt.figure(figsize=(8, 6))
-# plt.plot(fpr, tpr, label=f"ROC curve (AUC = {auc_score:.3f})")
-# plt.plot([0, 1], [0, 1], linestyle="--", label="Random Guess")
-# plt.xlabel("False Positive Rate")
-# plt.ylabel("True Positive Rate")
-# plt.title("ROC Curve")
-# plt.legend(loc="lower right")
-# plt.grid(True)
-# plt.savefig(os.path.join(RESULTS_DIR, "roc_curvevgg.png"))
-# plt.close()
+plt.figure(figsize=(8, 6))
+plt.plot(fpr, tpr, label=f"ROC curve (AUC = {auc_score:.3f})")
+plt.plot([0, 1], [0, 1], linestyle="--", label="Random Guess")
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curve")
+plt.legend(loc="lower right")
+plt.grid(True)
+plt.savefig(os.path.join(RESULTS_DIR, "roc_curvevgg.png"))
+plt.close()
 
-# # -----------------------------
-# # FALSE POSITIVES & FALSE NEGATIVES
-# # -----------------------------
-# false_positives = []
-# false_negatives = []
+# -----------------------------
+# FALSE POSITIVES & FALSE NEGATIVES
+# -----------------------------
+false_positives = []
+false_negatives = []
 
-# for images, labels in test_ds:
-#     probs = model.predict(images, verbose=0).flatten()
-#     preds = (probs > THRESHOLD).astype(int)
+for images, labels in test_ds:
+    probs = model.predict(images, verbose=0).flatten()
+    preds = (probs > THRESHOLD).astype(int)
 
-#     for img, true, pred in zip(images, labels.numpy(), preds):
-#         if true == 0 and pred == 1:
-#             false_positives.append(img)
-#         elif true == 1 and pred == 0:
-#             false_negatives.append(img)
+    for img, true, pred in zip(images, labels.numpy(), preds):
+        if true == 0 and pred == 1:
+            false_positives.append(img)
+        elif true == 1 and pred == 0:
+            false_negatives.append(img)
 
-# print(f"False Positives VGG: {len(false_positives)}")
-# print(f"False Negatives VGG: {len(false_negatives)}")
+print(f"False Positives VGG: {len(false_positives)}")
+print(f"False Negatives VGG: {len(false_negatives)}")
 
-# def show_images(images, title, max_images=10):
-#     if len(images) == 0:
-#         print(f"No images to display for {title}")
-#         return
+def show_images(images, title, max_images=10):
+    if len(images) == 0:
+        print(f"No images to display for {title}")
+        return
 
-#     plt.figure(figsize=(15, 6))
-#     for i, img in enumerate(images[:max_images]):
-#         plt.subplot(2, 5, i + 1)
-#         plt.imshow(img.numpy())
-#         plt.axis("off")
+    plt.figure(figsize=(15, 6))
+    for i, img in enumerate(images[:max_images]):
+        plt.subplot(2, 5, i + 1)
+        plt.imshow(img.numpy())
+        plt.axis("off")
 
-#     plt.suptitle(title, fontsize=16)
-#     plt.tight_layout()
-#     plt.savefig(os.path.join(RESULTS_DIR, f"{title.replace(' ', '_')}.png"))
-#     plt.close()
+    plt.suptitle(title, fontsize=16)
+    plt.tight_layout()
+    plt.savefig(os.path.join(RESULTS_DIR, f"{title.replace(' ', '_')}.png"))
+    plt.close()
 
-# show_images(false_positives, "False Positives (Legitimate → Predicted Phishing)")
-# show_images(false_negatives, "False Negatives (Phishing → Predicted Legitimate)")
+show_images(false_positives, "False Positives (Legitimate → Predicted Phishing)")
+show_images(false_negatives, "False Negatives (Phishing → Predicted Legitimate)")
 
-# # -----------------------------
-# # PREVIEW FIRST 10 TEST IMAGES
-# # -----------------------------
-# preview_images = []
-# preview_labels = []
+# -----------------------------
+# PREVIEW FIRST 10 TEST IMAGES
+# -----------------------------
+preview_images = []
+preview_labels = []
 
-# for images, labels in test_ds.unbatch().take(10):
-#     preview_images.append(images)
-#     preview_labels.append(labels)
+for images, labels in test_ds.unbatch().take(10):
+    preview_images.append(images)
+    preview_labels.append(labels)
 
-# plt.figure(figsize=(15, 6))
-# for i in range(len(preview_images)):
-#     plt.subplot(2, 5, i + 1)
-#     plt.imshow(preview_images[i].numpy())
-#     true_label = class_names[int(preview_labels[i])]
-#     pred_label = class_names[int((model.predict(preview_images[i][tf.newaxis, ...]).flatten() > THRESHOLD))]
-#     plt.title(f"True: {true_label}\nPred: {pred_label}", fontsize=10)
-#     plt.axis("off")
+plt.figure(figsize=(15, 6))
+for i in range(len(preview_images)):
+    plt.subplot(2, 5, i + 1)
+    plt.imshow(preview_images[i].numpy())
+    true_label = class_names[int(preview_labels[i])]
+    pred_label = class_names[int((model.predict(preview_images[i][tf.newaxis, ...]).flatten() > THRESHOLD))]
+    plt.title(f"True: {true_label}\nPred: {pred_label}", fontsize=10)
+    plt.axis("off")
 
-# plt.suptitle("Test Images Preview", fontsize=16)
-# plt.tight_layout()
-# plt.savefig(os.path.join(RESULTS_DIR, "test_previewvgg.png"))
-# plt.close()
+plt.suptitle("Test Images Preview", fontsize=16)
+plt.tight_layout()
+plt.savefig(os.path.join(RESULTS_DIR, "test_previewvgg.png"))
+plt.close()
